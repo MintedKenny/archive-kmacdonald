@@ -1,4 +1,4 @@
-import { BlogPosts } from 'app/components/posts'
+import { AllPosts } from 'app/components/posts'
 
 export default function Page() {
   return (
@@ -13,8 +13,12 @@ export default function Page() {
         early error detection ensures cleaner code, and my preference for dark
         mode, which eases long coding sessions by reducing eye strain.`}
       </p>
+      
       <div className="my-8">
-        <BlogPosts />
+        <h2 className="mb-4 text-xl font-semibold tracking-tighter">
+          Posts
+        </h2>
+        <AllPosts />
       </div>
     </section>
   )

@@ -1,20 +1,20 @@
 import Link from 'next/link'
-import { getBlogPosts, formatDate } from './utils'
+import { getFieldNotes, formatDate } from './utils'
 
 export const metadata = {
-  title: 'Blog',
-  description: 'Read my blog.',
+  title: 'Field Notes',
+  description: 'Read my field notes.',
 }
 
-export default async function BlogPage() {
-  const allPosts = await getBlogPosts()
+export default async function FieldNotesPage() {
+  const allFieldNotes = await getFieldNotes()
 
   return (
     <section>
       <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
-        Blog posts
+        Field notes
       </h1>
-      {allPosts
+      {allFieldNotes
         .sort((a, b) => {
           if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
             return -1
@@ -25,7 +25,7 @@ export default async function BlogPage() {
           <Link
             key={post.slug}
             className="flex flex-col space-y-1 mb-4"
-            href={`/blog/${post.slug}`}
+            href={`/field-notes/${post.slug}`}
           >
             <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2 md:items-start">
               <p className="text-neutral-600 dark:text-neutral-400 w-[120px] tabular-nums text-sm flex-shrink-0">
@@ -39,4 +39,4 @@ export default async function BlogPage() {
         ))}
     </section>
   )
-}
+} 

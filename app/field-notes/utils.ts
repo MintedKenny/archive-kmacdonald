@@ -1,4 +1,4 @@
-import { getNotionPosts } from '@/lib/notion'
+import { getNotionFieldNotes } from '@/lib/notion'
 
 type Metadata = {
   title: string
@@ -7,12 +7,12 @@ type Metadata = {
   image?: string
 }
 
-export async function getBlogPosts() {
-  // Only get posts from Notion CMS
-  const notionPosts = await getNotionPosts()
+export async function getFieldNotes() {
+  // Only get field notes from Notion CMS
+  const notionFieldNotes = await getNotionFieldNotes()
   
   // Sort by date
-  return notionPosts.sort((a, b) => 
+  return notionFieldNotes.sort((a, b) => 
     new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
   )
 }
@@ -51,4 +51,4 @@ export function formatDate(date: string, includeRelative = false) {
   }
 
   return `${fullDate} (${formattedDate})`
-}
+} 

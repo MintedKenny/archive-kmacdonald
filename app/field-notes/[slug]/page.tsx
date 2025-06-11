@@ -1,20 +1,20 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from 'app/components/mdx'
-import { formatDate, getBlogPosts } from 'app/blog/utils'
+import { formatDate, getFieldNotes } from 'app/field-notes/utils'
 import { baseUrl } from 'app/sitemap'
 
 export async function generateStaticParams() {
-  let posts = await getBlogPosts()
+  let fieldNotes = await getFieldNotes()
 
-  return posts.map((post) => ({
-    slug: post.slug,
+  return fieldNotes.map((note) => ({
+    slug: note.slug,
   }))
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params
-  let post = (await getBlogPosts()).find((post) => post.slug === slug)
-  if (!post) {
+  let note = (await getFieldNotes()).find((note) => note.slug === slug)
+  if (!note) {
     return
   }
 
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }) {
     publishedAt: publishedTime,
     summary: description,
     image,
-  } = post.metadata
+  } = note.metadata
   let ogImage = image
     ? image
     : `${baseUrl}/og?title=${encodeURIComponent(title)}`
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/field-notes/${note.slug}`,
       images: [
         {
           url: ogImage,
@@ -52,11 +52,11 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function Blog({ params }) {
+export default async function FieldNote({ params }) {
   const { slug } = await params
-  let post = (await getBlogPosts()).find((post) => post.slug === slug)
+  let note = (await getFieldNotes()).find((note) => note.slug === slug)
 
-  if (!post) {
+  if (!note) {
     notFound()
   }
 
@@ -69,14 +69,14 @@ export default async function Blog({ params }) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            headline: note.metadata.title,
+            datePublished: note.metadata.publishedAt,
+            dateModified: note.metadata.publishedAt,
+            description: note.metadata.summary,
+            image: note.metadata.image
+              ? `${baseUrl}${note.metadata.image}`
+              : `/og?title=${encodeURIComponent(note.metadata.title)}`,
+            url: `${baseUrl}/field-notes/${note.slug}`,
             author: {
               '@type': 'Person',
               name: 'My Portfolio',
@@ -85,16 +85,16 @@ export default async function Blog({ params }) {
         }}
       />
       <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
+        {note.metadata.title}
       </h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
+          {formatDate(note.metadata.publishedAt)}
         </p>
       </div>
       <article className="prose">
-        <CustomMDX source={post.content} />
+        <CustomMDX source={note.content} />
       </article>
     </section>
   )
-}
+} 
