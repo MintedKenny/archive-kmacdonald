@@ -33,9 +33,9 @@ html {
   min-width: 360px;
 }
 
+/* General prose styles for blog content */
 .prose .anchor {
   @apply absolute invisible no-underline;
-
   margin-left: -1em;
   padding-right: 0.5em;
   width: 80%;
@@ -83,24 +83,25 @@ html {
   @apply m-0;
 }
 
+/* Notion-specific prose styles */
 .prose p {
-  @apply my-4 text-neutral-800 dark:text-neutral-200;
+  @apply text-neutral-800 dark:text-neutral-200;
 }
 
 .prose h1 {
-  @apply text-4xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-4xl font-medium tracking-tight mt-8 mb-2;
 }
 
 .prose h2 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-xl font-medium tracking-tight mt-8 mb-2;
 }
 
 .prose h3 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-xl font-medium tracking-tight mt-8 mb-2;
 }
 
 .prose h4 {
-  @apply text-lg font-medium tracking-tight mt-6 mb-2;
+  @apply text-lg font-medium tracking-tight mt-8 mb-2;
 }
 
 .prose strong {
@@ -108,11 +109,23 @@ html {
 }
 
 .prose ul {
-  @apply list-disc pl-6;
+  @apply list-disc pl-6 text-neutral-800 dark:text-neutral-200;
 }
 
 .prose ol {
-  @apply list-decimal pl-6;
+  @apply list-decimal pl-6 text-neutral-800 dark:text-neutral-200;
+}
+
+.prose li {
+  @apply my-1 text-neutral-800 dark:text-neutral-200;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 py-2 my-4 italic text-neutral-700 dark:text-neutral-300;
+}
+
+.prose hr {
+  @apply border-t border-neutral-200 dark:border-neutral-800 my-8;
 }
 
 .prose > :first-child {
@@ -147,4 +160,21 @@ table {
 
 .title {
   text-wrap: balance;
+}
+
+.prose .callout {
+  @apply bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 my-4 flex items-start gap-3;
+}
+
+.prose .callout-icon {
+  @apply text-lg flex-shrink-0;
+}
+
+.prose .callout-content {
+  @apply flex-1;
+}
+
+/* Smaller text for source attributions */
+.prose .source-attribution {
+  @apply text-sm text-neutral-700 dark:text-neutral-300;
 }

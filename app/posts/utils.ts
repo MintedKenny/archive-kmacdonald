@@ -1,4 +1,4 @@
-import { getNotionFieldNotes } from '@/lib/notion'
+import { getNotionPosts, getNotionFieldNotes } from '@/lib/notion-renderer'
 
 type Metadata = {
   title: string
@@ -7,12 +7,17 @@ type Metadata = {
   image?: string
 }
 
-export async function getFieldNotes() {
-  // Only get field notes from Notion CMS
-  const notionFieldNotes = await getNotionFieldNotes()
+export async function getPosts() {
+  // Get both blog posts and field notes from Notion CMS
+  const [notionPosts, notionFieldNotes] = await Promise.all([
+    getNotionPosts(),
+    getNotionFieldNotes()
+  ])
   
-  // Sort by date
-  return notionFieldNotes.sort((a, b) => 
+  // Combine and sort by date
+  const allPosts = [...notionPosts, ...notionFieldNotes]
+  
+  return allPosts.sort((a, b) => 
     new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
   )
 }

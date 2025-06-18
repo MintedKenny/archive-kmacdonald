@@ -1,19 +1,19 @@
 import { notFound } from 'next/navigation'
-import { CustomMDX } from 'app/components/mdx'
-import { formatDate, getBlogPosts } from 'app/blog/utils'
+import { NotionRenderer } from 'app/components/notion-renderer'
+import { formatDate, getPosts } from 'app/posts/utils'
 import { baseUrl } from 'app/sitemap'
 
 export async function generateStaticParams() {
-  let posts = await getBlogPosts()
+  let posts = await getPosts()
 
   return posts.map((post) => ({
     slug: post.slug,
   }))
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  let post = (await getBlogPosts()).find((post) => post.slug === slug)
+  let post = (await getPosts()).find((post) => post.slug === slug)
   if (!post) {
     return
   }
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/posts/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -52,9 +52,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function Blog({ params }) {
+export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  let post = (await getBlogPosts()).find((post) => post.slug === slug)
+  let post = (await getPosts()).find((post) => post.slug === slug)
 
   if (!post) {
     notFound()
@@ -76,10 +76,10 @@ export default async function Blog({ params }) {
             image: post.metadata.image
               ? `${baseUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            url: `${baseUrl}/posts/${post.slug}`,
             author: {
               '@type': 'Person',
-              name: 'My Portfolio',
+              name: 'Kenneth Macdonald',
             },
           }),
         }}
@@ -93,8 +93,8 @@ export default async function Blog({ params }) {
         </p>
       </div>
       <article className="prose">
-        <CustomMDX source={post.content} />
+        <NotionRenderer blocks={post.blocks} />
       </article>
     </section>
   )
-}
+} 

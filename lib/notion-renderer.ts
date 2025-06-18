@@ -1,24 +1,62 @@
 import { Client } from '@notionhq/client'
-import { NotionToMarkdown } from 'notion-to-md'
+import { ReactNode } from 'react'
 
-type Metadata = {
-  title: string
-  publishedAt: string
-  summary: string
-  image?: string
+export interface NotionBlock {
+  id: string
+  type: string
+  has_children: boolean
+  [key: string]: any
 }
 
-type BlogPost = {
-  metadata: Metadata
+export interface BlogPost {
+  metadata: {
+    title: string
+    publishedAt: string
+    summary: string
+    image?: string
+  }
   slug: string
-  content: string
+  blocks: NotionBlock[]
 }
 
 const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
+  auth: process.env.NOTION_TOKEN!,
 })
 
-const n2m = new NotionToMarkdown({ notionClient: notion })
+// Get blocks directly instead of converting to markdown
+async function getPageBlocks(pageId: string): Promise<NotionBlock[]> {
+  const blocks: NotionBlock[] = []
+  let cursor: string | undefined
+  
+  do {
+    const response = await notion.blocks.children.list({
+      block_id: pageId,
+      ...(cursor && { start_cursor: cursor }),
+      page_size: 100,
+    })
+    
+    blocks.push(...response.results as NotionBlock[])
+    cursor = response.next_cursor || undefined
+  } while (cursor)
+  
+  return blocks
+}
+
+// Recursively get children for blocks that have them
+async function enrichBlocksWithChildren(blocks: NotionBlock[]): Promise<NotionBlock[]> {
+  const enrichedBlocks = await Promise.all(
+    blocks.map(async (block) => {
+      if (block.has_children) {
+        const children = await getPageBlocks(block.id)
+        const enrichedChildren = await enrichBlocksWithChildren(children)
+        return { ...block, children: enrichedChildren }
+      }
+      return block
+    })
+  )
+  
+  return enrichedBlocks
+}
 
 async function getNotionContentByCategory(category: string): Promise<BlogPost[]> {
   if (!process.env.NOTION_DATABASE_ID) {
@@ -63,15 +101,14 @@ async function getNotionContentByCategory(category: string): Promise<BlogPost[]>
         const slug = page.properties.Slug.rich_text[0]?.plain_text || 
                      metadata.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
-        // Get page content and convert to markdown
-        const mdblocks = await n2m.pageToMarkdown(page.id)
-        const mdString = n2m.toMarkdownString(mdblocks)
-        const content = mdString.parent || ''
+        // Get page blocks directly instead of converting to markdown
+        const blocks = await getPageBlocks(page.id)
+        const enrichedBlocks = await enrichBlocksWithChildren(blocks)
 
         return {
           metadata,
           slug,
-          content,
+          blocks: enrichedBlocks,
         }
       })
     )
