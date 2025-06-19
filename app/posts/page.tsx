@@ -7,15 +7,26 @@ export const metadata = {
   description: 'Read my blog posts and field notes.',
 }
 
-interface PostsPageProps {
-  searchParams: Promise<{ tag?: string }>
-}
-
-// Force this page to use ISR despite searchParams
+// Force ISR caching
 export const revalidate = 3600
 
-export default async function PostsPage({ searchParams }: PostsPageProps) {
-  const { tag } = await searchParams
+// Generate static params for all possible tag combinations
+export async function generateStaticParams() {
+  const posts = await getPosts()
+  const tags = Array.from(new Set(posts.flatMap(post => post.metadata.tags)))
+  
+  return [
+    {}, // For /posts (no tag filter)
+    ...tags.map(tag => ({ tag })) // For /posts with tag filtering
+  ]
+}
+
+interface PostsPageProps {
+  params: Promise<{ tag?: string }>
+}
+
+export default async function PostsPage({ params }: PostsPageProps) {
+  const { tag } = await params
   const allPosts = await getPosts()
   
   // Get all unique tags
@@ -61,7 +72,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
               return (
                 <Link
                   key={tagName}
-                  href={`/posts?tag=${encodeURIComponent(tagName)}`}
+                  href={`/posts/${tagName}`}
                   className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     tag === tagName
                       ? 'bg-neutral-800 dark:bg-neutral-200 text-white dark:text-black'
