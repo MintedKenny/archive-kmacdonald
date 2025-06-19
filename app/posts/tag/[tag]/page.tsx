@@ -2,20 +2,22 @@ import { getPosts } from '../../utils'
 import PostsList from '../../posts-list'
 import { notFound } from 'next/navigation'
 
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const posts = await getPosts()
   const tags = Array.from(new Set(posts.flatMap(post => post.metadata.tags)))
   
-  return tags.map(tag => ({ tag: encodeURIComponent(tag) }))
+  // Don't encode here - let Next.js handle it
+  return tags.map(tag => ({ tag }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params
-  const decodedTag = decodeURIComponent(tag)
   
   return {
-    title: `Posts`,
-    description: `All posts tagged with ${decodedTag}`,
+    title: `Posts tagged "${tag}"`,
+    description: `All posts tagged with ${tag}`,
   }
 }
 
@@ -25,14 +27,13 @@ interface TagPageProps {
 
 export default async function TagPage({ params }: TagPageProps) {
   const { tag } = await params
-  const decodedTag = decodeURIComponent(tag)
   const posts = await getPosts()
   
   // Check if tag exists
   const allTags = Array.from(new Set(posts.flatMap(post => post.metadata.tags)))
-  if (!allTags.includes(decodedTag)) {
+  if (!allTags.includes(tag)) {
     notFound()
   }
   
-  return <PostsList initialPosts={posts} selectedTag={decodedTag} />
+  return <PostsList initialPosts={posts} selectedTag={tag} />
 } 
