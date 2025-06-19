@@ -3,9 +3,6 @@ import { NotionRenderer } from 'app/components/notion-renderer'
 import { formatDate, getPosts } from 'app/posts/utils'
 import { baseUrl } from 'app/sitemap'
 
-// Add this line - cache for 1 hour (3600 seconds)
-export const revalidate = 3600
-
 export async function generateStaticParams() {
   let posts = await getPosts()
 

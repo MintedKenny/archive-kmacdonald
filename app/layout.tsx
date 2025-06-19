@@ -8,6 +8,9 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
 import { baseUrl } from './sitemap'
 
+// Add this line to apply 1-hour caching to all pages
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
