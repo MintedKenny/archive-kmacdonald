@@ -1,5 +1,6 @@
 import { AllPosts } from 'app/components/posts'
 import { ArrowIcon } from 'app/components/arrow-icon'
+import { ListFilter } from 'lucide-react'
 
 export default function Page() {
   return (
@@ -30,9 +31,18 @@ export default function Page() {
       </div>
       
       <div className="my-8">
-        <h2 className="mb-4 text-xl font-semibold tracking-tighter">
-          Posts
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold tracking-tighter">
+            Posts
+          </h2>
+          <a
+            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100 text-neutral-600 dark:text-neutral-300 text-sm"
+            href="/posts"
+          >
+            <ListFilter size={12} />
+            <p className="ml-2 h-5">by tag</p>
+          </a>
+        </div>
         <AllPosts />
       </div>
     </section>
