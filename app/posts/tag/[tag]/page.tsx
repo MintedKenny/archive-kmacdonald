@@ -2,8 +2,6 @@ import { getPosts } from '../../utils'
 import PostsList from '../../posts-list'
 import { notFound } from 'next/navigation'
 
-export const revalidate = 3600
-
 export async function generateStaticParams() {
   const posts = await getPosts()
   const tags = Array.from(new Set(posts.flatMap(post => post.metadata.tags)))
