@@ -11,6 +11,9 @@ interface PostsPageProps {
   searchParams: Promise<{ tag?: string }>
 }
 
+// Force this page to use ISR despite searchParams
+export const revalidate = 3600
+
 export default async function PostsPage({ searchParams }: PostsPageProps) {
   const { tag } = await searchParams
   const allPosts = await getPosts()
