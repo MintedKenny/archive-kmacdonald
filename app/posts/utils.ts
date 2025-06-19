@@ -1,25 +1,7 @@
-import { getNotionPosts, getNotionFieldNotes } from '@/lib/notion-renderer'
-
-type Metadata = {
-  title: string
-  publishedAt: string
-  summary: string
-  image?: string
-}
+import { getAllNotionPosts } from '@/lib/notion-renderer'
 
 export async function getPosts() {
-  // Get both blog posts and field notes from Notion CMS
-  const [notionPosts, notionFieldNotes] = await Promise.all([
-    getNotionPosts(),
-    getNotionFieldNotes()
-  ])
-  
-  // Combine and sort by date
-  const allPosts = [...notionPosts, ...notionFieldNotes]
-  
-  return allPosts.sort((a, b) => 
-    new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
-  )
+  return await getAllNotionPosts()
 }
 
 export function formatDate(date: string, includeRelative = false) {
@@ -46,8 +28,8 @@ export function formatDate(date: string, includeRelative = false) {
   }
 
   let fullDate = targetDate.toLocaleString('en-us', {
-    month: 'long',
-    day: 'numeric',
+    month: 'short',
+    day: '2-digit',
     year: 'numeric',
   })
 

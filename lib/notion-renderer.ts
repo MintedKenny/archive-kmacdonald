@@ -14,6 +14,7 @@ export interface BlogPost {
     publishedAt: string
     summary: string
     image?: string
+    tags: string[]
   }
   slug: string
   blocks: NotionBlock[]
@@ -58,7 +59,8 @@ async function enrichBlocksWithChildren(blocks: NotionBlock[]): Promise<NotionBl
   return enrichedBlocks
 }
 
-async function getNotionContentByCategory(category: string): Promise<BlogPost[]> {
+// Get all posts regardless of category
+export async function getAllNotionPosts(): Promise<BlogPost[]> {
   if (!process.env.NOTION_DATABASE_ID) {
     return []
   }
@@ -67,20 +69,10 @@ async function getNotionContentByCategory(category: string): Promise<BlogPost[]>
     const response = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID,
       filter: {
-        and: [
-          {
-            property: 'Published',
-            checkbox: {
-              equals: true,
-            },
-          },
-          {
-            property: 'Category',
-            select: {
-              equals: category,
-            },
-          },
-        ],
+        property: 'Published',
+        checkbox: {
+          equals: true,
+        },
       },
       sorts: [
         {
@@ -96,10 +88,10 @@ async function getNotionContentByCategory(category: string): Promise<BlogPost[]>
           title: page.properties.Name.title[0]?.plain_text || 'Untitled',
           publishedAt: page.properties.Date.date?.start || new Date().toISOString(),
           summary: page.properties.Summary.rich_text[0]?.plain_text || '',
+          tags: page.properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
         }
 
-        const slug = page.properties.Slug.rich_text[0]?.plain_text || 
-                     metadata.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+        const slug = metadata.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
         // Get page blocks directly instead of converting to markdown
         const blocks = await getPageBlocks(page.id)
@@ -115,25 +107,13 @@ async function getNotionContentByCategory(category: string): Promise<BlogPost[]>
 
     return posts
   } catch (error) {
-    console.error(`Error fetching Notion ${category} posts:`, error)
+    console.error('Error fetching Notion posts:', error)
     return []
   }
 }
 
-export async function getNotionPosts(): Promise<BlogPost[]> {
-  return getNotionContentByCategory('Blog')
-}
-
-export async function getNotionFieldNotes(): Promise<BlogPost[]> {
-  return getNotionContentByCategory('Field notes')
-}
-
-export async function getNotionPost(slug: string): Promise<BlogPost | null> {
-  const posts = await getNotionPosts()
+// Get a single post by slug
+export async function getNotionPostBySlug(slug: string): Promise<BlogPost | null> {
+  const posts = await getAllNotionPosts()
   return posts.find(post => post.slug === slug) || null
-}
-
-export async function getNotionFieldNote(slug: string): Promise<BlogPost | null> {
-  const fieldNotes = await getNotionFieldNotes()
-  return fieldNotes.find(note => note.slug === slug) || null
 } 
