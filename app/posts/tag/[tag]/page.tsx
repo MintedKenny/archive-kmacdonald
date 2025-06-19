@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ tag: stri
   const { tag } = await params
   
   return {
-    title: `Posts tagged "${tag}"`,
-    description: `All posts tagged with ${tag}`,
+    title: 'Posts',
+    description: 'Read my blog posts and field notes.',
   }
 }
 
