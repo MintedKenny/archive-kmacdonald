@@ -7,6 +7,8 @@ export const metadata = {
   description: 'Read my blog posts and field notes.',
 }
 
+export const revalidate = 3600
+
 interface PostsPageProps {
   searchParams: Promise<{ tag?: string }>
 }
