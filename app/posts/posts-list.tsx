@@ -46,7 +46,7 @@ export default function PostsList({
   return (
     <section>
       <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
-        Posts{selectedTag ? `: ${selectedTag}` : ''}
+        Posts
       </h1>
       
       {/* Tag Filter */}
