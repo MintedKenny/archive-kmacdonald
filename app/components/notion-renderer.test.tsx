@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { NotionRenderer } from './notion-renderer'
-import { NotionBlock } from '@/lib/notion-renderer'
+import { NotionBlock } from '@/lib/notion-client'
 
 describe('NotionRenderer', () => {
   it('renders paragraph blocks correctly', () => {

@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { highlight } from 'sugar-high'
-import { NotionBlock } from '@/lib/notion-renderer'
+import { NotionBlock } from '@/lib/notion-client'
 import { Tweet } from 'react-tweet'
 
 interface RichText {
@@ -25,7 +25,7 @@ interface RichText {
   href?: string | null
 }
 
-function renderRichText(richText: RichText[]): React.ReactNode {
+export function renderRichText(richText: RichText[]): React.ReactNode {
   return richText.map((text, index) => {
     const { annotations, plain_text, href, text: textObj } = text
     
@@ -191,7 +191,7 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }): React.ReactNode
         if (tweetId) {
           return (
             <div key={id} className="my-3">
-              <div className="scale-75 origin-top-left -mb-16">
+              <div className="scale-75 origin-top-left -mb-18">
                 <Tweet id={tweetId} />
               </div>
             </div>
@@ -233,7 +233,7 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }): React.ReactNode
         if (tweetId) {
           return (
             <div key={id} className="my-3">
-              <div className="scale-75 origin-top-left -mb-16">
+              <div className="scale-75 origin-top-left -mb-18">
                 <Tweet id={tweetId} />
               </div>
             </div>
