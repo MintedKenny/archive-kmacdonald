@@ -19,20 +19,19 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // If this is a verification request, return the token so we can see it
-    if (body.challenge) {
+    // Handle Notion's verification request
+    if (body.verification_token) {
+      // Log the token so you can see it
+      console.log('Verification token received:', body.verification_token)
+      
+      // Return success for verification
       return NextResponse.json({ 
         message: 'Verification token received',
-        token: body.challenge,
-        challenge: body.challenge 
+        received_token: body.verification_token
       })
     }
 
-    // Handle actual webhook event
-    // You can add logic here to check what type of event it is
-    // and revalidate specific paths based on the event
-    
-    // For now, revalidate all main paths when any database changes
+    // Handle actual webhook events after verification
     const pathsToRevalidate = [
       '/',
       '/posts',
