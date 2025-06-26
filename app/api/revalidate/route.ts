@@ -19,9 +19,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // If this is a verification request (contains challenge)
+    // If this is a verification request, return the token so we can see it
     if (body.challenge) {
-      return NextResponse.json({ challenge: body.challenge })
+      return NextResponse.json({ 
+        message: 'Verification token received',
+        token: body.challenge,
+        challenge: body.challenge 
+      })
     }
 
     // Handle actual webhook event
