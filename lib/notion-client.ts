@@ -30,6 +30,25 @@ export async function queryNotionDatabase(
   }
 }
 
+// Create a new page in a Notion database
+export async function createNotionPage(
+  databaseId: string,
+  properties: any
+) {
+  try {
+    const response = await notion.pages.create({
+      parent: {
+        database_id: databaseId,
+      },
+      properties,
+    })
+    return response
+  } catch (error) {
+    console.error('Error creating Notion page:', error)
+    throw error
+  }
+}
+
 // Get blocks for any page
 export async function getPageBlocks(pageId: string): Promise<NotionBlock[]> {
   const blocks: NotionBlock[] = []

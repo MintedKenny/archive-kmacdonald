@@ -23,6 +23,13 @@ export default function Page() {
         </a>
         <a
           className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+          href="/open-questions"
+        >
+          <ArrowIcon />
+          <p className="ml-2 h-7">questions</p>
+        </a>
+        <a
+          className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
           href="/links"
         >
           <ArrowIcon />
