@@ -54,7 +54,7 @@ export function renderRichText(richText: RichText[]): React.ReactNode {
   })
 }
 
-function NotionBlockRenderer({ block }: { block: NotionBlock }): React.ReactNode {
+const NotionBlockRenderer = React.memo(function NotionBlockRenderer({ block }: { block: NotionBlock }): React.ReactNode {
   const { type, id } = block
   const blockData = block[type] || {}
   
@@ -251,7 +251,7 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }): React.ReactNode
       console.warn(`Unsupported block type: ${type}`)
       return null
   }
-}
+})
 
 function groupBlocks(blocks: NotionBlock[]): NotionBlock[][] {
   const groups: NotionBlock[][] = []
@@ -287,7 +287,7 @@ function groupBlocks(blocks: NotionBlock[]): NotionBlock[][] {
   return groups
 }
 
-export function NotionRenderer({ blocks }: { blocks: NotionBlock[] }) {
+export const NotionRenderer = React.memo(function NotionRenderer({ blocks }: { blocks: NotionBlock[] }) {
   const groupedBlocks = groupBlocks(blocks)
   
   return (
@@ -311,4 +311,4 @@ export function NotionRenderer({ blocks }: { blocks: NotionBlock[] }) {
       })}
     </div>
   )
-} 
+})

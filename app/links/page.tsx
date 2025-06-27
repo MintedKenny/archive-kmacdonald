@@ -11,7 +11,7 @@ export default function LinksPage() {
       <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
         Links
       </h1>
-      <p className="mb-8 text-neutral-600 dark:text-neutral-400">
+      <p className="mb-8 text-sm text-neutral-600 dark:text-neutral-400">
         Current repository.
       </p>
       

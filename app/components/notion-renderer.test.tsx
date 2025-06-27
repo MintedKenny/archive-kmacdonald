@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import React from 'react'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { NotionRenderer } from './notion-renderer'
 import { NotionBlock } from '@/lib/notion-client'
+
+// Simple mock for react-tweet
+vi.mock('react-tweet', () => ({
+  Tweet: () => <div>Mocked Tweet</div>
+}))
 
 describe('NotionRenderer', () => {
   it('renders paragraph blocks correctly', () => {
@@ -75,7 +81,7 @@ describe('NotionRenderer', () => {
     ]
 
     render(<NotionRenderer blocks={blocks} />)
-    const emptyDiv = document.querySelector('.h-4')
+    const emptyDiv = document.querySelector('.my-6')
     expect(emptyDiv).toBeInTheDocument()
   })
 

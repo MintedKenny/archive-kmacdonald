@@ -9,10 +9,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./test/setup.ts'],
     globals: true,
+    css: true, // Enable CSS processing
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './'),
+      'app': path.resolve(__dirname, './app'),
     },
   },
 }) 

@@ -85,7 +85,7 @@ export default function PostsList({
 
       {/* Tag Description */}
       {selectedTag && tagDescriptions[selectedTag] && (
-        <p className="mb-8 text-neutral-600 dark:text-neutral-400">
+        <p className="mb-8 text-sm text-neutral-600 dark:text-neutral-400">
           {tagDescriptions[selectedTag]}
         </p>
       )}
