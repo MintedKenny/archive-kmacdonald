@@ -14,15 +14,15 @@ export const revalidate = 3600
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Kenneth Macdonald',
-    template: '%s | K Macdonald',
+    default: 'Kenneth MacDonald',
+    template: '%s | Kenneth MacDonald',
   },
-  description: 'Collection of posts.',
+  description: 'Digital archive by Kenneth MacDonald. Ongoing field notes, thoughts, and occasional blog posts from my journey.',
   openGraph: {
     title: 'Kenneth MacDonald',
-    description: 'Collection of posts.',
+    description: 'Digital archive with field notes, thoughts, and blog posts.',
     url: baseUrl,
-    siteName: 'archive-kmacdonald',
+    siteName: 'Kenneth MacDonald Archive',
     locale: 'en_US',
     type: 'website',
   },
