@@ -5,19 +5,39 @@ import { createSummarizationMessages } from 'lib/prompts/summarize'
 import { createSummaryBlocks } from 'lib/notion/content-to-notion'
 import OpenAI from 'openai'
 
-// Configure OpenAI client to use OpenRouter
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  baseURL: "https://openrouter.ai/api/v1",
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    "X-Title": "Research Content Summarizer",
-  },
-})
+interface JinaResponse {
+  data: {
+    content: string
+    title: string
+    url: string
+  }
+}
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ 
+    message: 'Endpoint is working!',
+    timestamp: new Date().toISOString(),
+    hasOpenRouterKey: !!process.env.OPENROUTER_API_KEY,
+    hasNotionToken: !!process.env.NOTION_TOKEN,
+    nodeEnv: process.env.NODE_ENV
+  })
+}
 
 export async function POST(request: NextRequest) {
+  console.log('🚀 Starting content summarization...')
+  
   try {
-    // Get page ID from request
+    // Initialize OpenAI client
+    const openai = new OpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY!,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+        "X-Title": "Research Content Summarizer",
+      },
+    })
+
+    // Extract page ID from query params
     const { searchParams } = new URL(request.url)
     const pageId = searchParams.get('id')
     
@@ -25,9 +45,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Page ID is required' }, { status: 400 })
     }
 
-    console.log(`Processing content summarization for page: ${pageId}`)
-
-    // 1. Retrieve page from Notion and extract URL
+    // Step 1: Get Notion page and extract URL
+    console.log('📄 Fetching Notion page...')
     const page = await getNotionPage(pageId)
     const url = extractUrlFromPage(page)
     
@@ -35,13 +54,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No URL found in page properties' }, { status: 400 })
     }
 
-    console.log(`Extracting content from URL: ${url}`)
-
-    // 2. Extract content using Jina Reader
-    const jinaResponse = await fetch(`https://r.jina.ai/${url}`, {
+    // Step 2: Extract content using Jina Reader
+    console.log(`🌐 Extracting content from: ${url}`)
+    const jinaResponse = await fetch(`https://r.jina.ai/${encodeURIComponent(url)}`, {
       headers: { 
         'Accept': 'application/json',
-        'User-Agent': 'Research Content Summarizer'
+        'User-Agent': 'Research-Summarizer/1.0'
       },
     })
 
@@ -49,16 +67,21 @@ export async function POST(request: NextRequest) {
       throw new Error(`Jina Reader failed: ${jinaResponse.status} ${jinaResponse.statusText}`)
     }
 
-    const jinaData = await jinaResponse.json()
-    const content = jinaData.content || jinaData.text || ''
+    const jinaData: JinaResponse = await jinaResponse.json()
+    const content = jinaData.data?.content
+    const title = jinaData.data?.title || 'Untitled'
 
-    if (!content) {
-      return NextResponse.json({ error: 'No content extracted from URL' }, { status: 400 })
+    if (!content?.trim()) {
+      return NextResponse.json({ 
+        error: 'No content extracted from URL',
+        url 
+      }, { status: 400 })
     }
 
-    console.log(`Content extracted, length: ${content.length} characters`)
+    console.log(`📄 Content extracted: ${content.length} characters`)
 
-    // 3. Generate summary using OpenRouter
+    // Step 3: Generate AI summary
+    console.log('🤖 Generating AI summary...')
     const completion = await openai.chat.completions.create({
       model: "google/gemini-2.5-flash",
       messages: createSummarizationMessages(content),
@@ -67,46 +90,59 @@ export async function POST(request: NextRequest) {
     })
 
     const summary = completion.choices[0]?.message?.content
-    if (!summary) {
-      throw new Error('Failed to generate summary')
+    if (!summary?.trim()) {
+      throw new Error('Failed to generate summary - empty response')
     }
 
-    console.log('Summary generated successfully')
+    console.log(`✅ Summary generated: ${summary.length} characters`)
 
-    // 4. Convert summary to Notion blocks and append to page
+    // Step 4: Convert summary to Notion blocks using AST parsing
+    console.log('🔄 Converting summary to Notion blocks...')
     const summaryBlocks = createSummaryBlocks(summary, url)
+    
+    console.log(`📝 Created ${summaryBlocks.length} Notion blocks`)
+
+    // Step 5: Append blocks to Notion page
+    console.log('📤 Appending blocks to Notion page...')
     await appendBlocksToPage(pageId, summaryBlocks)
 
-    // 5. Update page title if needed (status is now handled by the button)
+    // Step 6: Update page title if needed
     const currentTitle = extractTitleFromPage(page)
-    const urlTitle = jinaData.title || 'Untitled'
-    
-    // Only update title if it's empty or generic
     if (!currentTitle || currentTitle === 'Untitled') {
-      const updates = {
-        'Title': createTitleProperty(urlTitle)
-      }
-      await updateNotionPage(pageId, updates)
+      console.log('📝 Updating page title...')
+      await updateNotionPage(pageId, {
+        'Title': createTitleProperty(title)
+      })
     }
 
-    console.log('Page updated successfully')
+    console.log('🎉 Content summarization completed successfully')
 
     return NextResponse.json({ 
-      success: true, 
+      success: true,
       message: 'Content summarized and appended successfully',
-      title: urlTitle,
-      summaryLength: summary.length,
-      model: completion.model
+      data: {
+        title,
+        url,
+        summaryLength: summary.length,
+        blocksCreated: summaryBlocks.length,
+        model: completion.model,
+        timestamp: new Date().toISOString()
+      }
     })
 
   } catch (error) {
-    console.error('Error in summarize-content API:', error)
+    console.error('💥 Summarization error:', error)
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorDetails = error instanceof Error ? error.stack : String(error)
+    
     return NextResponse.json(
       { 
-        error: 'Failed to process content', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+        error: 'Failed to process content summarization', 
+        message: errorMessage,
+        timestamp: new Date().toISOString()
       }, 
       { status: 500 }
     )
   }
-} 
+}
