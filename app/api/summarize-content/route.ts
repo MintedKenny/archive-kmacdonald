@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         console.log('📨 Webhook payload:', JSON.stringify(body, null, 2))
         
-        // The page ID might be in different places depending on how Notion sends it
-        pageId = body.id || body.page_id || body.pageId
+        // The page ID is in body.data.id for Notion webhooks
+        pageId = body.data?.id || body.id || body.page_id || body.pageId
         
         // If still no page ID, check if it's in a properties object
         if (!pageId && body.properties) {
