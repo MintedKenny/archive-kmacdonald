@@ -108,4 +108,61 @@ export async function enrichBlocksWithChildren(blocks: NotionBlock[]): Promise<N
     console.error('Error enriching blocks with children:', error)
     throw new Error(`Failed to enrich blocks: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
+}
+
+// Get a specific page with its properties
+export async function getNotionPage(pageId: string) {
+  if (!pageId) {
+    throw new Error('Page ID is required')
+  }
+
+  try {
+    const response = await notion.pages.retrieve({
+      page_id: pageId,
+    })
+    return response
+  } catch (error) {
+    console.error('Error retrieving Notion page:', error)
+    throw new Error(`Failed to retrieve page: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+// Update page properties
+export async function updateNotionPage(pageId: string, properties: any) {
+  if (!pageId) {
+    throw new Error('Page ID is required')
+  }
+
+  try {
+    const response = await notion.pages.update({
+      page_id: pageId,
+      properties,
+    })
+    return response
+  } catch (error) {
+    console.error('Error updating Notion page:', error)
+    throw new Error(`Failed to update page: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+// Append blocks to a page
+export async function appendBlocksToPage(pageId: string, blocks: any[]) {
+  if (!pageId) {
+    throw new Error('Page ID is required')
+  }
+
+  if (!blocks || blocks.length === 0) {
+    throw new Error('Blocks are required')
+  }
+
+  try {
+    const response = await notion.blocks.children.append({
+      block_id: pageId,
+      children: blocks,
+    })
+    return response
+  } catch (error) {
+    console.error('Error appending blocks to page:', error)
+    throw new Error(`Failed to append blocks: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
 } 

@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { NotionRenderer } from './notion-renderer'
-import { NotionBlock } from '@/lib/notion-client'
+import { NotionBlock } from '@/lib/notion/notion-client'
 
 // Simple mock for react-tweet
 vi.mock('react-tweet', () => ({

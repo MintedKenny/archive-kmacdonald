@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { highlight } from 'sugar-high'
-import { NotionBlock } from '@/lib/notion-client'
+import { NotionBlock } from '@/lib/notion/notion-client'
 import { Tweet } from 'react-tweet'
 
 interface RichText {

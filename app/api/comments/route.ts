@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createNotionPage } from '@/lib/notion-client'
+import { createNotionPage } from '@/lib/notion/notion-client'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 

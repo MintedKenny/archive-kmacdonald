@@ -1,4 +1,4 @@
-import { getPageBlocks, enrichBlocksWithChildren } from '@/lib/notion-client'
+import { getPageBlocks, enrichBlocksWithChildren } from '@/lib/notion/notion-client'
 
 export async function getLinksPageContent() {
   if (!process.env.NOTION_PAGE_ID_LINKS) {

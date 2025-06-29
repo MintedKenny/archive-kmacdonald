@@ -1,4 +1,4 @@
-import { queryNotionDatabase, getPageBlocks, enrichBlocksWithChildren } from '@/lib/notion-client'
+import { queryNotionDatabase, getPageBlocks, enrichBlocksWithChildren } from '@/lib/notion/notion-client'
 
 export interface BlogPost {
   metadata: {

@@ -1,4 +1,4 @@
-import { queryNotionDatabase } from '@/lib/notion-client'
+import { queryNotionDatabase } from '@/lib/notion/notion-client'
 
 export interface OpenQuestion {
   id: string

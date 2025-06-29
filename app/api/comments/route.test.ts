@@ -54,7 +54,7 @@ describe('/api/comments', () => {
   })
 
   it('should create comment with valid input', async () => {
-    const { createNotionPage } = await import('@/lib/notion-client')
+    const { createNotionPage } = await import('@/lib/notion/notion-client')
     
     const request = new NextRequest('http://localhost', {
       method: 'POST',
