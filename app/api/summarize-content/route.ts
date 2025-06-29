@@ -37,13 +37,39 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Extract page ID from query params
+    // Extract page ID from query params OR request body
     const { searchParams } = new URL(request.url)
-    const pageId = searchParams.get('id')
+    let pageId = searchParams.get('id') // For manual testing
+    
+    // If no page ID in URL, try to get it from the request body (Notion webhook)
+    if (!pageId) {
+      try {
+        const body = await request.json()
+        console.log('📨 Webhook payload:', JSON.stringify(body, null, 2))
+        
+        // The page ID might be in different places depending on how Notion sends it
+        pageId = body.id || body.page_id || body.pageId
+        
+        // If still no page ID, check if it's in a properties object
+        if (!pageId && body.properties) {
+          // Look for ID in various possible property names
+          pageId = body.properties.id?.id || 
+                   body.properties.ID?.id || 
+                   body.properties.Page?.id ||
+                   body.properties.page_id?.id
+        }
+      } catch (e) {
+        console.error('Error parsing request body:', e)
+      }
+    }
     
     if (!pageId) {
-      return NextResponse.json({ error: 'Page ID is required' }, { status: 400 })
+      return NextResponse.json({ 
+        error: 'Page ID is required. Provide it as ?id=<page_id> or in the request body.' 
+      }, { status: 400 })
     }
+    
+    console.log('📄 Using page ID:', pageId)
 
     // Step 1: Get Notion page and extract URL
     console.log('📄 Fetching Notion page...')
