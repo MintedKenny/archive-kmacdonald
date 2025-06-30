@@ -6,6 +6,7 @@ import { ArrowIcon } from './arrow-icon'
 
 export default function Footer() {
   const [emailCopied, setEmailCopied] = useState(false)
+  const [urlCopied, setUrlCopied] = useState(false)
 
   const copyEmail = async () => {
     try {
@@ -14,6 +15,16 @@ export default function Footer() {
       setTimeout(() => setEmailCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy email:', err)
+    }
+  }
+
+  const shareUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setUrlCopied(true)
+      setTimeout(() => setUrlCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy URL:', err)
     }
   }
 
@@ -59,6 +70,25 @@ export default function Footer() {
             )}
             <p className="ml-2 h-7">
               {emailCopied ? 'copied' : 'email'}
+            </p>
+          </button>
+        </li>
+        <li>
+          <button
+            className={`flex items-center transition-all cursor-pointer ${
+              urlCopied 
+                ? 'text-green-400 dark:text-green-600' 
+                : 'hover:text-neutral-800 dark:hover:text-neutral-100'
+            }`}
+            onClick={shareUrl}
+          >
+            {urlCopied ? (
+              <Check size={12} />
+            ) : (
+              <ArrowIcon />
+            )}
+            <p className="ml-2 h-7">
+              {urlCopied ? 'copied' : 'share'}
             </p>
           </button>
         </li>
