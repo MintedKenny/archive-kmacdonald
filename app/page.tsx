@@ -9,8 +9,17 @@ export default function Page() {
         Kenneth MacDonald
       </h1>
       <p className="mb-4">
-        {`Ongoing archive. Field notes and maybe the occasional blog post. 
-        Nothing nuanced said. All from a founder with no company.`}
+        Ongoing archive. Field notes and maybe the occasional blog post.
+        Nothing nuanced said. Building{' '}
+        <a
+          href="https://standardforensics.com"
+          className="transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Standard Forensics
+        </a>
+        .
       </p>
       
       <div className="mb-8 flex flex-row space-x-4 text-neutral-600 dark:text-neutral-300">
